@@ -1,12 +1,107 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String                    @id @default(cuid())
+  email           String                    @unique
+  name            String?
+  image           String?
+  hashedPassword  String
+  ratingAverage   Float                     @default(0)
+  ratingCount     Int                       @default(0)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  conversations   ConversationParticipant[]
+  items           Item[]
+  sentMessages    Message[]
+  ratingsReceived Rating[]                  @relation("RateeRatings")
+  ratingsGiven    Rating[]                  @relation("RaterRatings")
+
+  @@map("users")
+}
+
+model Item {
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  exchangeType  ExchangeType
+  tradeFor      String?
+  photos        String[]
+  lat           Float
+  lng           Float
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  ownerId       String
+  conversations Conversation[]
+  owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ratings       Rating[]
+
+  @@map("items")
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  itemId       String?
+  participants ConversationParticipant[]
+  item         Item?                     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String
+  createdAt      DateTime     @default(now())
+  conversationId String
+  senderId       String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  score     Int      @db.SmallInt
+  comment   String?
+  createdAt DateTime @default(now())
+  raterId   String
+  rateeId   String
+  itemId    String?
+  item      Item?    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  ratee     User     @relation("RateeRatings", fields: [rateeId], references: [id], onDelete: Cascade)
+  rater     User     @relation("RaterRatings", fields: [raterId], references: [id], onDelete: Cascade)
+
+  @@unique([raterId, rateeId, itemId])
+  @@map("ratings")
+}
+
+enum ExchangeType {
+  BORROW
+  GIVE
+  TRADE
 }

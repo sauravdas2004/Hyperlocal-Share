@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hyperlocal Share 🌍
 
-## Getting Started
+A modern web application that enables users within hyper-local communities to share, borrow, and trade items with each other. Built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **🔍 Hyper-local Search**: Find items within a specific radius using coordinates or GPS
+- **🗺️ Interactive Map**: Visual map interface with pins showing available items
+- **💬 Real-time Messaging**: Secure in-app chat system for arranging exchanges
+- **⭐ Rating System**: Reciprocal rating system to build trust within the community
+- **📱 Responsive Design**: Beautiful, modern UI that works on all devices
+- **🔐 Secure Authentication**: User registration and login with NextAuth
+- **📸 Item Listings**: Create detailed item listings with photos and descriptions
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Quick Start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Set up environment variables**:
+   Create a `.env` file with:
+   ```env
+   DATABASE_URL="file:./dev.db"
+   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXT_PUBLIC_MAPBOX_TOKEN="your-mapbox-token"
+   ```
 
-## Learn More
+3. **Set up the database**:
+   ```bash
+   npx prisma migrate dev
+   npx prisma generate
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: SQLite (development), PostgreSQL (production)
+- **Authentication**: NextAuth.js
+- **Maps**: Mapbox GL JS
+- **Icons**: Lucide React
+- **Styling**: Tailwind CSS with custom gradients and animations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📱 Pages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Home** (`/`): Search interface with location-based filtering
+- **Map** (`/map`): Interactive map view with item pins
+- **New Item** (`/items/new`): Create new item listings
+- **Item Detail** (`/items/[id]`): View item details and message owner
+- **Inbox** (`/inbox`): Chat interface for conversations
+- **Login** (`/login`): User authentication
+- **Signup** (`/signup`): User registration
+
+## 🎨 Design Features
+
+- **Gradient Backgrounds**: Beautiful color gradients throughout the app
+- **Card-based Layout**: Clean, modern card designs
+- **Responsive Grid**: Adaptive layouts for all screen sizes
+- **Icon Integration**: Consistent iconography with Lucide React
+- **Smooth Animations**: Hover effects and transitions
+- **Modern Typography**: Clean, readable fonts with proper hierarchy
+
+## 🔧 Development
+
+The app uses:
+- **App Router**: Next.js 13+ app directory structure
+- **Server Components**: For better performance and SEO
+- **Client Components**: For interactive features
+- **TypeScript**: Full type safety
+- **Prisma**: Type-safe database access
+- **React Query**: Efficient data fetching and caching
+
+## 📦 Database Schema
+
+- **Users**: Authentication and profile information
+- **Items**: Item listings with location and metadata
+- **Conversations**: Chat threads between users
+- **Messages**: Individual chat messages
+- **Ratings**: User ratings and reviews
+- **Notifications**: System notifications
+
+## 🌟 Key Features Implemented
+
+✅ User authentication and profiles  
+✅ Item creation and management  
+✅ Hyper-local search with radius filtering  
+✅ Interactive map with item pins  
+✅ Real-time messaging system  
+✅ Rating and review system  
+✅ Responsive, modern UI design  
+✅ Location-based services  
+✅ Image upload support  
+
+## 🚀 Deployment
+
+Ready for deployment on Vercel, Netlify, or any Node.js hosting platform. Just update the environment variables for production and deploy!
+
+---
+
+Built with ❤️ for building stronger communities through local sharing.
