@@ -25,7 +25,7 @@ A modern web application that enables users within hyper-local communities to sh
    DATABASE_URL="file:./dev.db"
    NEXTAUTH_SECRET="your-secret-key"
    NEXTAUTH_URL="http://localhost:3000"
-   NEXT_PUBLIC_MAPBOX_TOKEN="your-mapbox-token"
+   NEXT_PUBLIC_MAPLIBRE_TOKEN="your-maplibre-token"
    ```
 
 3. **Set up the database**:
@@ -48,7 +48,7 @@ A modern web application that enables users within hyper-local communities to sh
 - **Backend**: Next.js API Routes, Prisma ORM
 - **Database**: SQLite (development), PostgreSQL (production)
 - **Authentication**: NextAuth.js
-- **Maps**: Mapbox GL JS
+- **Maps**: MapLibre GL JS
 - **Icons**: Lucide React
 - **Styling**: Tailwind CSS with custom gradients and animations
 

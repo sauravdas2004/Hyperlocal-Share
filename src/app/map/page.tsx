@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapPin, Search, Navigation, Filter } from "lucide-react";
 
 // Note: MapLibre GL doesn't require accessToken like Mapbox does
-// If using Mapbox tiles, set the token via the style URL or map options
+// Using MapLibre GL for map rendering
 
 export default function MapPage() {
 	const container = useRef<HTMLDivElement | null>(null);
@@ -20,7 +20,7 @@ export default function MapPage() {
 		if (!container.current || mapRef.current) return;
 		const map = new maplibregl.Map({
 			container: container.current,
-			style: "mapbox://styles/mapbox/streets-v12",
+			style: "https://demotiles.maplibre.org/style.json",
 			center: [0, 0],
 			zoom: 2,
 		});
@@ -50,10 +50,10 @@ export default function MapPage() {
 
 		markers.current.forEach((m) => m.remove());
 		markers.current = results.map((i: any) => {
-			const marker = new mapboxgl.Marker({ color: "#0d9488" })
+			const marker = new maplibregl.Marker({ color: "#0d9488" })
 				.setLngLat([i.lng, i.lat])
 				.setPopup(
-					new mapboxgl.Popup().setHTML(`
+					new maplibregl.Popup().setHTML(`
 					<div class="p-2 min-w-[140px]">
 						<h3 class="font-semibold text-gray-900">${i.title}</h3>
 						<p class="text-sm text-gray-600">${i.category} • ${i.exchangeType}</p>
