@@ -36,12 +36,16 @@ export const authOptions: NextAuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user }: { token: JWT; user?: { id: string; email: string; name: string | null; image: string | null } }) {
-			if (user?.id) token.id = user.id;
+		async jwt({ token, user }) {
+			if (user && "id" in user) {
+				token.id = user.id;
+			}
 			return token;
 		},
-		async session({ session, token }: { session: any; token: JWT }) {
-			if (session.user && token?.id) session.user.id = token.id as string;
+		async session({ session, token }) {
+			if (session.user && token?.id) {
+				(session.user as any).id = token.id as string;
+			}
 			return session;
 		},
 	},
