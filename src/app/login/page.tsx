@@ -18,7 +18,7 @@ export default function LoginPage() {
 				redirect: true,
 				callbackUrl: "/",
 			});
-			if ((result as any)?.error) alert("Invalid credentials");
+			if (result && "error" in result && result.error) alert("Invalid credentials");
 		} finally {
 			setLoading(false);
 		}

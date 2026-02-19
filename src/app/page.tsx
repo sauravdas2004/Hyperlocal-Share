@@ -28,7 +28,7 @@ export default function Home() {
 		enabled: false,
 	});
 
-	function useMyLocation(autoSearch = true) {
+	function getMyLocation(autoSearch = true) {
 		setLocationError(null);
 		if (!("geolocation" in navigator)) {
 			setLocationError("Geolocation is not supported by your browser.");
@@ -159,7 +159,7 @@ export default function Home() {
 						<button
 							className="btn-secondary"
 							type="button"
-							onClick={() => useMyLocation(true)}
+							onClick={() => getMyLocation(true)}
 							disabled={locationLoading}
 						>
 							<MapPin className="h-4 w-4" />
@@ -173,7 +173,7 @@ export default function Home() {
 						<button
 							className="px-6 py-3 rounded-[var(--radius)] font-medium inline-flex items-center gap-2 bg-[var(--accent-muted)] text-[var(--accent)] hover:opacity-90 transition-opacity"
 							onClick={async () => {
-								const payload: any = {};
+							const payload: Record<string, number> = {};
 								if (lat !== "" && lng !== "") {
 									payload.lat = Number(lat);
 									payload.lng = Number(lng);
@@ -202,7 +202,7 @@ export default function Home() {
 							Found {items.length} items
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{items.map((i: any) => (
+								{items.map((i: {id: string; title: string; category: string; exchangeType: string; photos: string}) => (
 								<a
 									key={i.id}
 									href={`/items/${i.id}`}

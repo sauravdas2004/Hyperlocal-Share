@@ -13,7 +13,7 @@ export default function MapPage() {
 	const [center, setCenter] = useState<[number, number] | null>(null);
 	const [radiusKm, setRadiusKm] = useState(1);
 	const [category, setCategory] = useState("");
-	const [items, setItems] = useState<any[]>([]);
+	const [items, setItems] = useState<Array<{id: string; title: string; category: string; exchangeType: string; lng: number; lat: number}>>([]); 
 	const markers = useRef<maplibregl.Marker[]>([]);
 
 	useEffect(() => {
@@ -45,11 +45,11 @@ export default function MapPage() {
 			...(category ? { category } : {}),
 		});
 		const res = await fetch(`/api/search?${params.toString()}`);
-		const results = await res.json();
+		const results: Array<{id: string; title: string; category: string; exchangeType: string; lng: number; lat: number}> = await res.json();
 		setItems(results);
 
 		markers.current.forEach((m) => m.remove());
-		markers.current = results.map((i: any) => {
+		markers.current = results.map((i: {id: string; lng: number; lat: number; title: string; category: string; exchangeType: string}) => {
 			const marker = new maplibregl.Marker({ color: "#0d9488" })
 				.setLngLat([i.lng, i.lat])
 				.setPopup(
