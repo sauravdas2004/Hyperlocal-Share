@@ -1,5 +1,6 @@
 import type { DefaultSession } from "next-auth";
 import type { NextAuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
@@ -35,12 +36,12 @@ export const authOptions: NextAuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user }) {
-			if (user?.id) token.id = (user as any).id;
+		async jwt({ token, user }: { token: JWT; user?: { id: string; email: string; name: string | null; image: string | null } }) {
+			if (user?.id) token.id = user.id;
 			return token;
 		},
-		async session({ session, token }) {
-			if (session.user && token?.id) (session.user as any).id = token.id as string;
+		async session({ session, token }: { session: any; token: JWT }) {
+			if (session.user && token?.id) session.user.id = token.id as string;
 			return session;
 		},
 	},
