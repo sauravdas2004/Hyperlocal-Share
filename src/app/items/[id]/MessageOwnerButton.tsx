@@ -34,9 +34,9 @@ export default function MessageOwnerButton({ ownerId, itemId }: { ownerId: strin
 	}
 
 	return (
-		<button 
-			className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium disabled:opacity-50" 
-			onClick={startConversation} 
+		<button
+			className="btn-primary w-full"
+			onClick={startConversation}
 			disabled={loading}
 		>
 			<MessageSquare className="h-4 w-4" />

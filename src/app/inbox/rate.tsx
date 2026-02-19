@@ -24,14 +24,25 @@ export default function RateUser({ rateeId, itemId, onDone }: { rateeId: string;
 	}
 
 	return (
-		<div className="border p-3 rounded space-y-2">
-			<div className="font-medium">Rate your exchange</div>
-			<input className="border p-2 w-24" type="number" min={1} max={5} value={score} onChange={(e)=>setScore(Number(e.target.value))} />
-			<textarea className="border p-2 w-full" placeholder="Optional comment" value={comment} onChange={(e)=>setComment(e.target.value)} />
-			<button className="px-3 py-2 bg-black text-white rounded" onClick={submit} disabled={submitting}>Submit</button>
+		<div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3 shadow-[var(--shadow-sm)]">
+			<div className="font-medium text-[var(--foreground)]">Rate your exchange</div>
+			<input
+				className="input-base w-24"
+				type="number"
+				min={1}
+				max={5}
+				value={score}
+				onChange={(e)=>setScore(Number(e.target.value))}
+			/>
+			<textarea
+				className="input-base min-h-[80px] resize-none"
+				placeholder="Optional comment"
+				value={comment}
+				onChange={(e)=>setComment(e.target.value)}
+			/>
+			<button className="btn-primary" onClick={submit} disabled={submitting}>
+				Submit
+			</button>
 		</div>
 	);
 }
-
-
-

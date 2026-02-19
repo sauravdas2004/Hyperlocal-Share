@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import MessageOwnerButton from "./MessageOwnerButton";
-import { MapPin, Tag, Calendar, User } from "lucide-react";
+import { MapPin, Tag, Calendar, User, ArrowLeft } from "lucide-react";
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -9,91 +9,98 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
 		where: { id },
 		include: { owner: true }
 	});
-	if (!item) return <div className="max-w-3xl mx-auto p-4">Item not found</div>;
+	if (!item) return <div className="max-w-3xl mx-auto p-4 text-[var(--foreground)]">Item not found</div>;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+		<div className="relative min-h-screen">
 			<div className="max-w-6xl mx-auto px-4 py-8">
-				<div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-						{/* Image Gallery */}
-						<div className="p-8">
-							<div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+				<div className="bg-[var(--surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow)] border border-[var(--border)] overflow-hidden">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+						{/* Image */}
+						<div className="p-6 lg:p-8">
+							<div className="aspect-square rounded-xl bg-gradient-to-br from-[var(--border)] to-[var(--border)]/60 overflow-hidden flex items-center justify-center">
 								{Array.isArray(item.photos) && item.photos.length > 0 ? (
-									<img 
-										src={item.photos[0]} 
+									<img
+										src={item.photos[0]}
 										alt={item.title}
-										className="w-full h-full object-cover rounded-xl"
+										className="w-full h-full object-cover"
 									/>
 								) : (
-									<div className="text-center text-gray-400">
-										<div className="text-6xl mb-4">📦</div>
-										<p className="text-lg">No image available</p>
+									<div className="text-center text-[var(--muted)]">
+										<div className="text-5xl mb-3">📦</div>
+										<p className="text-sm font-medium">No image available</p>
 									</div>
 								)}
 							</div>
 						</div>
-						
-						{/* Item Details */}
-						<div className="p-8 space-y-6">
-							<div className="flex items-center gap-4 mb-6">
-								<Link href="/" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-									← Back
+
+						{/* Details */}
+						<div className="p-6 lg:p-8 flex flex-col">
+							<div className="flex items-start gap-4 mb-6">
+								<Link
+									href="/"
+									className="p-2 rounded-[var(--radius)] text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)] transition-colors shrink-0"
+								>
+									<ArrowLeft className="h-5 w-5" />
 								</Link>
-								<div className="flex-1">
-									<h1 className="text-3xl font-bold text-gray-900 mb-2">{item.title}</h1>
-									<div className="flex items-center gap-3">
-										<span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium flex items-center gap-1">
-											<Tag className="h-3 w-3" />
+								<div className="min-w-0 flex-1">
+									<h1 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-3 tracking-tight">
+										{item.title}
+									</h1>
+									<div className="flex flex-wrap gap-2">
+										<span className="px-3 py-1.5 bg-[var(--brand-muted)] text-[var(--brand)] rounded-full text-sm font-medium inline-flex items-center gap-1.5">
+											<Tag className="h-3.5 w-3.5" />
 											{item.category}
 										</span>
-										<span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+										<span className="px-3 py-1.5 bg-[var(--accent-muted)] text-[var(--accent)] rounded-full text-sm font-medium">
 											{item.exchangeType}
 										</span>
 									</div>
 								</div>
 							</div>
-							
-							<div className="prose max-w-none">
-								<h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-								<p className="text-gray-700 leading-relaxed text-lg">{item.description}</p>
+
+							<div className="mb-6">
+								<h3 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">
+									Description
+								</h3>
+								<p className="text-[var(--foreground)] leading-relaxed">
+									{item.description}
+								</p>
 							</div>
 
 							{item.exchangeType === "TRADE" && item.tradeFor && (
-								<div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-									<h4 className="font-semibold text-yellow-800 mb-2">Looking for:</h4>
-									<p className="text-yellow-700">{item.tradeFor}</p>
+								<div className="mb-6 p-4 rounded-[var(--radius)] bg-[var(--accent-muted)]/50 border border-[var(--accent)]/20">
+									<h4 className="font-semibold text-[var(--accent)] mb-1">Looking for</h4>
+									<p className="text-[var(--foreground)] text-sm">{item.tradeFor}</p>
 								</div>
 							)}
-							
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div className="bg-gray-50 rounded-lg p-4">
-									<h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-										<MapPin className="h-4 w-4 text-blue-600" />
-										Location
-									</h4>
-									<p className="text-sm text-gray-600">{item.lat}, {item.lng}</p>
+
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+								<div className="p-4 rounded-[var(--radius)] bg-[var(--background)] border border-[var(--border)]">
+									<div className="flex items-center gap-2 text-[var(--brand)] mb-1">
+										<MapPin className="h-4 w-4" />
+										<span className="text-xs font-semibold uppercase tracking-wider">Location</span>
+									</div>
+									<p className="text-sm text-[var(--muted)]">{item.lat}, {item.lng}</p>
 								</div>
-								
-								<div className="bg-gray-50 rounded-lg p-4">
-									<h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-										<User className="h-4 w-4 text-green-600" />
-										Owner
-									</h4>
-									<p className="text-sm text-gray-600">{item.owner.name}</p>
+								<div className="p-4 rounded-[var(--radius)] bg-[var(--background)] border border-[var(--border)]">
+									<div className="flex items-center gap-2 text-[var(--brand)] mb-1">
+										<User className="h-4 w-4" />
+										<span className="text-xs font-semibold uppercase tracking-wider">Owner</span>
+									</div>
+									<p className="text-sm text-[var(--muted)]">{item.owner.name}</p>
 								</div>
-								
-								<div className="bg-gray-50 rounded-lg p-4">
-									<h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-										<Calendar className="h-4 w-4 text-purple-600" />
-										Posted
-									</h4>
-									<p className="text-sm text-gray-600">
+								<div className="p-4 rounded-[var(--radius)] bg-[var(--background)] border border-[var(--border)]">
+									<div className="flex items-center gap-2 text-[var(--brand)] mb-1">
+										<Calendar className="h-4 w-4" />
+										<span className="text-xs font-semibold uppercase tracking-wider">Posted</span>
+									</div>
+									<p className="text-sm text-[var(--muted)]">
 										{new Date(item.createdAt).toLocaleDateString()}
 									</p>
 								</div>
 							</div>
-							
+
 							<MessageOwnerButton ownerId={item.ownerId} itemId={item.id} />
 						</div>
 					</div>

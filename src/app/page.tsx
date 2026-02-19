@@ -1,13 +1,16 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { MapPin, Search, Plus, Users, Heart, Star } from "lucide-react";
+import { MapPin, Search, Plus, Users, Heart } from "lucide-react";
 
 export default function Home() {
+	const queryClient = useQueryClient();
 	const [lat, setLat] = useState<number | "">("");
 	const [lng, setLng] = useState<number | "">("");
 	const [radiusKm, setRadiusKm] = useState(1);
 	const [category, setCategory] = useState("");
+	const [locationLoading, setLocationLoading] = useState(false);
+	const [locationError, setLocationError] = useState<string | null>(null);
 
 	const { data: items = [], refetch, isFetching } = useQuery({
 		queryKey: ["search", lat, lng, radiusKm, category],
@@ -26,110 +29,160 @@ export default function Home() {
 	});
 
 	function useMyLocation(autoSearch = true) {
+		setLocationError(null);
 		if (!("geolocation" in navigator)) {
-			alert("Geolocation not supported by your browser");
+			setLocationError("Geolocation is not supported by your browser.");
 			return;
 		}
+		// Geolocation only works on https or localhost
+		if (typeof window !== "undefined" && !window.isSecureContext) {
+			setLocationError("Location only works on HTTPS or localhost. Try opening this page at http://localhost:3000");
+			return;
+		}
+		setLocationLoading(true);
 		navigator.geolocation.getCurrentPosition(
-			(pos) => {
-				setLat(Number(pos.coords.latitude.toFixed(6)));
-				setLng(Number(pos.coords.longitude.toFixed(6)));
-				if (autoSearch) setTimeout(() => refetch(), 0);
+			async (pos) => {
+				setLocationLoading(false);
+				setLocationError(null);
+				const newLat = Number(pos.coords.latitude.toFixed(6));
+				const newLng = Number(pos.coords.longitude.toFixed(6));
+				setLat(newLat);
+				setLng(newLng);
+				if (autoSearch) {
+					const params = new URLSearchParams({
+						lat: String(newLat),
+						lng: String(newLng),
+						radiusKm: String(radiusKm),
+						...(category ? { category } : {}),
+					});
+					const res = await fetch(`/api/search?${params.toString()}`);
+					const data = await res.json();
+					queryClient.setQueryData(["search", newLat, newLng, radiusKm, category], data);
+				}
 			},
 			(err) => {
-				console.error(err);
-				alert("Couldn't get your location. Please allow permission or enter manually.");
+				setLocationLoading(false);
+				const code = (err as GeolocationPositionError)?.code;
+				const message =
+					code === 1
+						? "Location permission denied. Please allow location access and try again."
+						: code === 2
+							? "Location unavailable. Please enter coordinates manually."
+							: code === 3
+								? "Location request timed out. Please try again or enter manually."
+								: "Couldn't get your location. Please allow permission or enter manually.";
+				setLocationError(message);
 			},
-			{ enableHighAccuracy: true, timeout: 10000 }
+			{ enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
 		);
 	}
 
-  return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-			{/* Hero Section */}
-			<div className="bg-white shadow-sm border-b">
-				<div className="max-w-6xl mx-auto px-4 py-12">
-					<div className="text-center">
-						<h1 className="text-4xl font-bold text-gray-900 mb-4">
-							Connect with Your Community
-						</h1>
-						<p className="text-xl text-gray-600 mb-8">
-							Share, borrow, and trade items with neighbors in your area
-						</p>
-					</div>
+	return (
+		<div className="relative min-h-screen">
+			{/* Hero */}
+			<div className="relative overflow-hidden border-b border-[var(--border)] bg-gradient-to-br from-[var(--brand-muted)]/40 via-[var(--surface)] to-[var(--accent-muted)]/30">
+				<div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(13,148,136,0.15),transparent)]" />
+				<div className="relative max-w-6xl mx-auto px-4 py-16 text-center">
+					<h1 className="text-4xl md:text-5xl font-bold text-[var(--foreground)] tracking-tight mb-4">
+						Connect with Your{" "}
+						<span className="text-[var(--brand)]">Community</span>
+					</h1>
+					<p className="text-lg md:text-xl text-[var(--muted)] max-w-2xl mx-auto">
+						Share, borrow, and trade items with neighbors in your area. Build a stronger community through local exchanges.
+					</p>
 				</div>
 			</div>
 
-			<div className="max-w-6xl mx-auto px-4 py-8">
-				{/* Search Section */}
-				<div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-					<h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-						<Search className="h-6 w-6 text-blue-600" />
+			<div className="relative max-w-6xl mx-auto px-4 py-10">
+				{/* Search card */}
+				<div className="bg-[var(--surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow)] border border-[var(--border)] p-6 md:p-8 mb-10">
+					<h2 className="text-xl font-semibold text-[var(--foreground)] mb-6 flex items-center gap-2">
+						<span className="w-9 h-9 rounded-lg bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center">
+							<Search className="h-5 w-5" />
+						</span>
 						Find Items Near You
 					</h2>
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Latitude</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="23.844393" 
-								value={lat} 
-								onChange={(e)=>setLat(e.target.value ? Number(e.target.value) : "")} 
+							<label className="text-sm font-medium text-[var(--foreground)]">Latitude</label>
+							<input
+								className="input-base"
+								placeholder="23.844393"
+								type="text"
+								inputMode="decimal"
+								value={lat === "" ? "" : String(lat)}
+								onChange={(e) => setLat(e.target.value === "" ? "" : Number(e.target.value))}
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Longitude</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="91.421444" 
-								value={lng} 
-								onChange={(e)=>setLng(e.target.value ? Number(e.target.value) : "")} 
+							<label className="text-sm font-medium text-[var(--foreground)]">Longitude</label>
+							<input
+								className="input-base"
+								placeholder="91.421444"
+								type="text"
+								inputMode="decimal"
+								value={lng === "" ? "" : String(lng)}
+								onChange={(e) => setLng(e.target.value === "" ? "" : Number(e.target.value))}
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Radius (km)</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								type="number" 
-								min={0.1} 
-								max={10} 
-								step="0.1" 
-								value={radiusKm} 
-								onChange={(e)=>setRadiusKm(Number(e.target.value))} 
+							<label className="text-sm font-medium text-[var(--foreground)]">Radius (km)</label>
+							<input
+								className="input-base"
+								type="number"
+								min={0.1}
+								max={10}
+								step="0.1"
+								value={radiusKm}
+								onChange={(e) => setRadiusKm(Number(e.target.value))}
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Category</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="electronics, books, tools..." 
-								value={category} 
-								onChange={(e)=>setCategory(e.target.value)} 
+							<label className="text-sm font-medium text-[var(--foreground)]">Category</label>
+							<input
+								className="input-base"
+								placeholder="electronics, books, tools..."
+								value={category}
+								onChange={(e) => setCategory(e.target.value)}
 							/>
 						</div>
 					</div>
 					<div className="flex flex-wrap gap-3">
-						<button 
-							className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium" 
-							onClick={()=>refetch()} 
+						<button
+							className="btn-primary"
+							onClick={() => refetch()}
 							disabled={isFetching}
 						>
 							<Search className="h-4 w-4" />
 							{isFetching ? "Searching..." : "Search"}
 						</button>
-						<button 
-							className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 font-medium" 
-							onClick={()=>useMyLocation(true)}
+						<button
+							className="btn-secondary"
+							type="button"
+							onClick={() => useMyLocation(true)}
+							disabled={locationLoading}
 						>
 							<MapPin className="h-4 w-4" />
-							Use my location
+							{locationLoading ? "Getting location…" : "Use my location"}
 						</button>
+						{locationError && (
+							<p className="text-sm text-red-600 mt-1 w-full" role="alert">
+								{locationError}
+							</p>
+						)}
 						<button
-							className="px-6 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-2 font-medium"
-							onClick={async ()=>{
+							className="px-6 py-3 rounded-[var(--radius)] font-medium inline-flex items-center gap-2 bg-[var(--accent-muted)] text-[var(--accent)] hover:opacity-90 transition-opacity"
+							onClick={async () => {
 								const payload: any = {};
-								if (lat !== "" && lng !== "") { payload.lat = Number(lat); payload.lng = Number(lng); }
-								await fetch("/api/dev/seed", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+								if (lat !== "" && lng !== "") {
+									payload.lat = Number(lat);
+									payload.lng = Number(lng);
+								}
+								await fetch("/api/dev/seed", {
+									method: "POST",
+									headers: { "Content-Type": "application/json" },
+									body: JSON.stringify(payload),
+								});
 								await refetch();
 							}}
 						>
@@ -139,36 +192,45 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Results Section */}
+				{/* Results */}
 				{items.length > 0 && (
-					<div className="bg-white rounded-2xl shadow-lg p-6">
-						<h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-							<Heart className="h-5 w-5 text-red-500" />
+					<div className="bg-[var(--surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow)] border border-[var(--border)] p-6 md:p-8">
+						<h3 className="text-lg font-semibold text-[var(--foreground)] mb-6 flex items-center gap-2">
+							<span className="w-8 h-8 rounded-lg bg-[var(--accent-muted)] text-[var(--accent)] flex items-center justify-center">
+								<Heart className="h-4 w-4" />
+							</span>
 							Found {items.length} items
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							{items.map((i: any) => (
-								<div key={i.id} className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow">
-									<div className="aspect-square bg-gray-200 rounded-lg mb-3 flex items-center justify-center">
-										<Users className="h-12 w-12 text-gray-400" />
+								<a
+									key={i.id}
+									href={`/items/${i.id}`}
+									className="group block bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] p-5 transition-all duration-300 hover:shadow-[var(--shadow-lg)] hover:border-[var(--brand)]/30 hover:-translate-y-1"
+								>
+									<div className="aspect-square rounded-xl bg-[var(--border)]/50 mb-4 flex items-center justify-center overflow-hidden">
+										<Users className="h-14 w-14 text-[var(--muted)] group-hover:scale-110 transition-transform duration-300" />
 									</div>
-									<h4 className="font-semibold text-gray-900 mb-2">{i.title}</h4>
-									<div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-										<span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">{i.category}</span>
-										<span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">{i.exchangeType}</span>
+									<h4 className="font-semibold text-[var(--foreground)] mb-2 group-hover:text-[var(--brand)] transition-colors">
+										{i.title}
+									</h4>
+									<div className="flex flex-wrap gap-2 text-sm mb-3">
+										<span className="px-2.5 py-1 bg-[var(--brand-muted)] text-[var(--brand)] rounded-full font-medium">
+											{i.category}
+										</span>
+										<span className="px-2.5 py-1 bg-[var(--accent-muted)] text-[var(--accent)] rounded-full font-medium">
+											{i.exchangeType}
+										</span>
 									</div>
-									<a 
-										href={`/items/${i.id}`} 
-										className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
-									>
+									<span className="inline-flex items-center gap-1 text-[var(--brand)] font-medium text-sm">
 										View details →
-									</a>
-								</div>
+									</span>
+								</a>
 							))}
 						</div>
 					</div>
 				)}
 			</div>
-    </div>
-  );
+		</div>
+	);
 }

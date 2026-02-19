@@ -51,119 +51,71 @@ export default function NewItemPage() {
 		}
 	}
 
+	const inputClass = "w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30 focus:border-[var(--brand)] transition-all duration-200";
+
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-			<div className="max-w-2xl mx-auto px-4 py-8">
-				<div className="bg-white rounded-2xl shadow-lg p-8">
+		<div className="min-h-screen bg-gradient-to-br from-[var(--brand-muted)]/20 via-[var(--background)] to-[var(--accent-muted)]/10 py-10">
+			<div className="max-w-2xl mx-auto px-4">
+				<div className="bg-[var(--surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow)] border border-[var(--border)] p-6 md:p-8">
 					<div className="flex items-center gap-4 mb-8">
-						<Link href="/" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+						<Link href="/" className="p-2 rounded-[var(--radius)] text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)] transition-colors">
 							<ArrowLeft className="h-5 w-5" />
 						</Link>
-						<h1 className="text-3xl font-bold text-gray-900">Create New Item</h1>
+						<h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Create new item</h1>
 					</div>
 
-					<div className="space-y-6">
+					<div className="space-y-5">
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-								<Type className="h-4 w-4" />
+							<label className="text-sm font-medium text-[var(--foreground)] flex items-center gap-2">
+								<Type className="h-4 w-4 text-[var(--brand)]" />
 								Title
 							</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="What are you offering?" 
-								value={title} 
-								onChange={(e)=>setTitle(e.target.value)} 
-							/>
+							<input className={inputClass} placeholder="What are you offering?" value={title} onChange={(e)=>setTitle(e.target.value)} />
 						</div>
-
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Description</label>
-							<textarea 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-none" 
-								placeholder="Describe your item in detail..." 
-								value={description} 
-								onChange={(e)=>setDescription(e.target.value)} 
-							/>
+							<label className="text-sm font-medium text-[var(--foreground)]">Description</label>
+							<textarea className={inputClass + " h-24 resize-none"} placeholder="Describe your item in detail..." value={description} onChange={(e)=>setDescription(e.target.value)} />
 						</div>
-
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-								<Tag className="h-4 w-4" />
+							<label className="text-sm font-medium text-[var(--foreground)] flex items-center gap-2">
+								<Tag className="h-4 w-4 text-[var(--brand)]" />
 								Category
 							</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="electronics, books, tools, furniture..." 
-								value={category} 
-								onChange={(e)=>setCategory(e.target.value)} 
-							/>
+							<input className={inputClass} placeholder="electronics, books, tools, furniture..." value={category} onChange={(e)=>setCategory(e.target.value)} />
 						</div>
-
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700">Exchange Type</label>
-							<select 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								value={exchangeType} 
-								onChange={(e)=>setExchangeType(e.target.value as any)}
-							>
+							<label className="text-sm font-medium text-[var(--foreground)]">Exchange type</label>
+							<select className={inputClass} value={exchangeType} onChange={(e)=>setExchangeType(e.target.value as "BORROW"|"GIVE"|"TRADE")}>
 								<option value="GIVE">Give away (free)</option>
 								<option value="BORROW">Borrow (temporary)</option>
 								<option value="TRADE">Trade (exchange)</option>
 							</select>
 						</div>
-
 						{exchangeType === "TRADE" && (
 							<div className="space-y-2">
-								<label className="text-sm font-medium text-gray-700">Looking for...</label>
-								<input 
-									className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-									placeholder="What would you like in return?" 
-									value={tradeFor} 
-									onChange={(e)=>setTradeFor(e.target.value)} 
-								/>
+								<label className="text-sm font-medium text-[var(--foreground)]">Looking for…</label>
+								<input className={inputClass} placeholder="What would you like in return?" value={tradeFor} onChange={(e)=>setTradeFor(e.target.value)} />
 							</div>
 						)}
-
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-								<MapPin className="h-4 w-4" />
+							<label className="text-sm font-medium text-[var(--foreground)] flex items-center gap-2">
+								<MapPin className="h-4 w-4 text-[var(--brand)]" />
 								Location
 							</label>
 							<div className="grid grid-cols-2 gap-3">
-								<input 
-									className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-									placeholder="Latitude" 
-									value={lat} 
-									onChange={(e)=>setLat(e.target.value ? Number(e.target.value) : "")} 
-								/>
-								<input 
-									className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-									placeholder="Longitude" 
-									value={lng} 
-									onChange={(e)=>setLng(e.target.value ? Number(e.target.value) : "")} 
-								/>
+								<input className={inputClass} placeholder="Latitude" value={lat} onChange={(e)=>setLat(e.target.value ? Number(e.target.value) : "")} />
+								<input className={inputClass} placeholder="Longitude" value={lng} onChange={(e)=>setLng(e.target.value ? Number(e.target.value) : "")} />
 							</div>
 						</div>
-
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-								<Upload className="h-4 w-4" />
+							<label className="text-sm font-medium text-[var(--foreground)] flex items-center gap-2">
+								<Upload className="h-4 w-4 text-[var(--brand)]" />
 								Photo URLs
 							</label>
-							<input 
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-								placeholder="Paste image URLs separated by commas" 
-								value={photos} 
-								onChange={(e)=>setPhotos(e.target.value)} 
-							/>
+							<input className={inputClass} placeholder="Paste image URLs separated by commas" value={photos} onChange={(e)=>setPhotos(e.target.value)} />
 						</div>
-
-						<button 
-							className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50" 
-							onClick={submit} 
-							disabled={loading}
-						>
-							{loading ? "Creating..." : "Create Item"}
+						<button className="btn-primary w-full py-4 text-lg" onClick={submit} disabled={loading}>
+							{loading ? "Creating…" : "Create item"}
 						</button>
 					</div>
 				</div>

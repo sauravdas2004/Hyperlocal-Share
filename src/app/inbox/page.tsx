@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageSquare, Send, ArrowLeft, Users, Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -45,19 +45,20 @@ export default function InboxPage() {
 	const selectedConv = conversations.find(c => c.id === selectedId);
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+		<div className="min-h-screen bg-[var(--background)]">
 			<div className="max-w-6xl mx-auto px-4 py-8">
-				<div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+				<div className="bg-[var(--surface)] rounded-[var(--radius-lg)] shadow-[var(--shadow)] border border-[var(--border)] overflow-hidden">
 					<div className="flex h-[600px]">
-						{/* Conversations List */}
-						<div className="w-1/3 border-r border-gray-200 bg-gray-50">
-							<div className="p-4 border-b border-gray-200">
+						<div className="w-1/3 border-r border-[var(--border)] bg-[var(--background)]">
+							<div className="p-4 border-b border-[var(--border)]">
 								<div className="flex items-center gap-3">
-									<Link href="/" className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+									<Link href="/" className="p-2 rounded-[var(--radius)] text-[var(--muted)] hover:bg-[var(--border)] transition-colors">
 										<ArrowLeft className="h-4 w-4" />
 									</Link>
-									<h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-										<MessageSquare className="h-5 w-5 text-blue-600" />
+									<h2 className="text-xl font-semibold text-[var(--foreground)] flex items-center gap-2">
+										<span className="w-8 h-8 rounded-lg bg-[var(--brand)]/10 text-[var(--brand)] flex items-center justify-center">
+											<MessageSquare className="h-5 w-5" />
+										</span>
 										Messages
 									</h2>
 								</div>
@@ -66,22 +67,22 @@ export default function InboxPage() {
 								{conversations.map((c)=>{
 									const others = c.participants.filter((p:any)=>p.userId!==c.participants[0].userId);
 									return (
-										<button 
-											key={c.id} 
-											onClick={()=>setSelectedId(c.id)} 
-											className={`w-full text-left p-4 border-b border-gray-200 hover:bg-gray-100 transition-colors ${
-												selectedId===c.id ? "bg-blue-50 border-blue-200" : ""
+										<button
+											key={c.id}
+											onClick={()=>setSelectedId(c.id)}
+											className={`w-full text-left p-4 border-b border-[var(--border)] hover:bg-[var(--border)]/50 transition-colors ${
+												selectedId===c.id ? "bg-[var(--brand-muted)]/50 border-l-2 border-l-[var(--brand)]" : ""
 											}`}
 										>
 											<div className="flex items-center gap-3">
-												<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-													<Users className="h-5 w-5 text-blue-600" />
+												<div className="w-10 h-10 bg-[var(--brand-muted)] rounded-full flex items-center justify-center">
+													<Users className="h-5 w-5 text-[var(--brand)]" />
 												</div>
 												<div className="flex-1 min-w-0">
-													<div className="font-medium text-gray-900 truncate">
+													<div className="font-medium text-[var(--foreground)] truncate">
 														{c.item?.title ?? "Direct chat"}
 													</div>
-													<div className="text-sm text-gray-500 truncate">
+													<div className="text-sm text-[var(--muted)] truncate">
 														{others[0]?.user?.name ?? "Unknown user"}
 													</div>
 												</div>
@@ -90,8 +91,8 @@ export default function InboxPage() {
 									);
 								})}
 								{conversations.length === 0 && (
-									<div className="p-8 text-center text-gray-500">
-										<MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+									<div className="p-8 text-center text-[var(--muted)]">
+										<MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-40" />
 										<p>No conversations yet</p>
 										<p className="text-sm">Start by messaging an item owner</p>
 									</div>
@@ -99,34 +100,31 @@ export default function InboxPage() {
 							</div>
 						</div>
 
-						{/* Chat Area */}
 						<div className="flex-1 flex flex-col">
 							{selectedConv ? (
 								<>
-									{/* Chat Header */}
-									<div className="p-4 border-b border-gray-200 bg-white">
+									<div className="p-4 border-b border-[var(--border)] bg-[var(--surface)]">
 										<div className="flex items-center gap-3">
-											<div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-												<Users className="h-4 w-4 text-green-600" />
+											<div className="w-8 h-8 bg-[var(--brand-muted)] rounded-full flex items-center justify-center">
+												<Users className="h-4 w-4 text-[var(--brand)]" />
 											</div>
 											<div>
-												<h3 className="font-semibold text-gray-900">
+												<h3 className="font-semibold text-[var(--foreground)]">
 													{selectedConv.item?.title ?? "Direct chat"}
 												</h3>
-												<p className="text-sm text-gray-500">
+												<p className="text-sm text-[var(--muted)]">
 													{selectedConv.participants.find((p:any)=>p.userId!==selectedConv.participants[0].userId)?.user?.name ?? "Unknown user"}
 												</p>
 											</div>
 										</div>
 									</div>
 
-									{/* Messages */}
-									<div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+									<div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[var(--background)]">
 										{messages.map((m)=> (
 											<div key={m.id} className="flex justify-end">
-												<div className="max-w-xs lg:max-w-md px-4 py-2 bg-blue-600 text-white rounded-2xl rounded-br-sm">
+												<div className="max-w-xs lg:max-w-md px-4 py-2 bg-[var(--brand)] text-white rounded-2xl rounded-br-sm shadow-[var(--shadow-sm)]">
 													<p className="text-sm">{m.content}</p>
-													<p className="text-xs text-blue-100 mt-1 flex items-center gap-1">
+													<p className="text-xs opacity-80 mt-1 flex items-center gap-1">
 														<Clock className="h-3 w-3" />
 														{new Date(m.createdAt).toLocaleTimeString()}
 													</p>
@@ -134,37 +132,33 @@ export default function InboxPage() {
 											</div>
 										))}
 										{messages.length === 0 && (
-											<div className="text-center text-gray-500 py-8">
-												<MessageSquare className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+											<div className="text-center text-[var(--muted)] py-8">
+												<MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-40" />
 												<p>No messages yet</p>
 											</div>
 										)}
 									</div>
 
-									{/* Message Input */}
-									<div className="p-4 border-t border-gray-200 bg-white">
+									<div className="p-4 border-t border-[var(--border)] bg-[var(--surface)]">
 										<div className="flex gap-2">
-											<input 
-												className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-												placeholder="Type a message..." 
-												value={input} 
+											<input
+												className="flex-1 input-base rounded-full py-2.5"
+												placeholder="Type a message..."
+												value={input}
 												onChange={(e)=>setInput(e.target.value)}
-												onKeyPress={(e) => e.key === 'Enter' && send()}
+												onKeyPress={(e) => e.key === "Enter" && send()}
 											/>
-											<button 
-												className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2" 
-												onClick={send}
-											>
+											<button className="btn-primary rounded-full px-4 py-2.5" onClick={send}>
 												<Send className="h-4 w-4" />
 											</button>
 										</div>
 									</div>
 								</>
 							) : (
-								<div className="flex-1 flex items-center justify-center text-gray-500">
+								<div className="flex-1 flex items-center justify-center text-[var(--muted)]">
 									<div className="text-center">
-										<MessageSquare className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-										<p className="text-lg font-medium">Select a conversation</p>
+										<MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-40" />
+										<p className="text-lg font-medium text-[var(--foreground)]">Select a conversation</p>
 										<p className="text-sm">Choose a chat from the sidebar to start messaging</p>
 									</div>
 								</div>
