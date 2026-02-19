@@ -1,6 +1,5 @@
 import type { DefaultSession } from "next-auth";
 import type { NextAuthOptions } from "next-auth";
-import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
@@ -44,6 +43,7 @@ export const authOptions: NextAuthOptions = {
 		},
 		async session({ session, token }) {
 			if (session.user && token?.id) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				(session.user as any).id = token.id as string;
 			}
 			return session;
