@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import { MessageSquare, Send, ArrowLeft, Users, Clock } from "lucide-react";
 import Link from "next/link";
 
+type Participant = { userId: string; user: { name: string } };
+type Conversation = { id: string; item: { title: string }; participants: Participant[] };
+type Message = { id: string; content: string; createdAt: string };
+
 export default function InboxPage() {
-	const [conversations, setConversations] = useState<any[]>([]);
+	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-	const [messages, setMessages] = useState<any[]>([]);
+	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState("");
 
 	useEffect(() => {
@@ -17,14 +21,13 @@ export default function InboxPage() {
 	}, []);
 
 	useEffect(() => {
-		let timer: any;
-		async function load() {
+		const load = async () => {
 			if (!selectedId) return;
 			const res = await fetch(`/api/messages?conversationId=${selectedId}`);
 			if (res.ok) setMessages(await res.json());
-		}
+		};
 		load();
-		timer = setInterval(load, 3000);
+		const timer = setInterval(load, 3000);
 		return () => clearInterval(timer);
 	}, [selectedId]);
 
@@ -65,7 +68,7 @@ export default function InboxPage() {
 							</div>
 							<div className="overflow-y-auto h-full">
 								{conversations.map((c)=>{
-									const others = c.participants.filter((p:any)=>p.userId!==c.participants[0].userId);
+									const others = c.participants.filter((p: Participant) => p.userId !== c.participants[0].userId);
 									return (
 										<button
 											key={c.id}
@@ -113,7 +116,7 @@ export default function InboxPage() {
 													{selectedConv.item?.title ?? "Direct chat"}
 												</h3>
 												<p className="text-sm text-[var(--muted)]">
-													{selectedConv.participants.find((p:any)=>p.userId!==selectedConv.participants[0].userId)?.user?.name ?? "Unknown user"}
+													{selectedConv.participants.find((p: Participant) => p.userId !== selectedConv.participants[0].userId)?.user?.name ?? "Unknown user"}
 												</p>
 											</div>
 										</div>

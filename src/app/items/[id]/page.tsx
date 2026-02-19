@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 import MessageOwnerButton from "./MessageOwnerButton";
 import { MapPin, Tag, Calendar, User, ArrowLeft } from "lucide-react";
@@ -18,12 +19,14 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
 						{/* Image */}
 						<div className="p-6 lg:p-8">
-							<div className="aspect-square rounded-xl bg-gradient-to-br from-[var(--border)] to-[var(--border)]/60 overflow-hidden flex items-center justify-center">
+							<div className="aspect-square rounded-xl bg-gradient-to-br from-[var(--border)] to-[var(--border)]/60 overflow-hidden flex items-center justify-center relative">
 								{Array.isArray(item.photos) && item.photos.length > 0 ? (
-									<img
+									<Image
 										src={item.photos[0]}
 										alt={item.title}
-										className="w-full h-full object-cover"
+										fill
+										className="object-cover"
+										sizes="(max-width: 1024px) 100vw, 50vw"
 									/>
 								) : (
 									<div className="text-center text-[var(--muted)]">

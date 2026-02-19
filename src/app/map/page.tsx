@@ -13,7 +13,8 @@ export default function MapPage() {
 	const [center, setCenter] = useState<[number, number] | null>(null);
 	const [radiusKm, setRadiusKm] = useState(1);
 	const [category, setCategory] = useState("");
-	const [items, setItems] = useState<Array<{id: string; title: string; category: string; exchangeType: string; lng: number; lat: number}>>([]); 
+	type MapItem = { id: string; title: string; category: string; exchangeType: string; lng: number; lat: number };
+	const [items, setItems] = useState<MapItem[]>([]);
 	const markers = useRef<maplibregl.Marker[]>([]);
 
 	useEffect(() => {
@@ -45,11 +46,11 @@ export default function MapPage() {
 			...(category ? { category } : {}),
 		});
 		const res = await fetch(`/api/search?${params.toString()}`);
-		const results: Array<{id: string; title: string; category: string; exchangeType: string; lng: number; lat: number}> = await res.json();
+		const results: MapItem[] = await res.json();
 		setItems(results);
 
 		markers.current.forEach((m) => m.remove());
-		markers.current = results.map((i: {id: string; lng: number; lat: number; title: string; category: string; exchangeType: string}) => {
+		markers.current = results.map((i: MapItem) => {
 			const marker = new maplibregl.Marker({ color: "#0d9488" })
 				.setLngLat([i.lng, i.lat])
 				.setPopup(
@@ -130,7 +131,7 @@ export default function MapPage() {
 							Found {items.length} items
 						</h3>
 						<div className="space-y-1 overflow-y-auto flex-1 min-h-0">
-							{items.map((i: any) => (
+							{items.map((i) => (
 								<button
 									key={i.id}
 									type="button"
