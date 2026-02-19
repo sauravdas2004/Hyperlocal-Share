@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/serverAuth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { ExchangeType } from "@/generated/prisma";
 
 const createSchema = z.object({
 	title: z.string().min(2, "Title too short"),
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
 				title: data.title,
 				description: data.description,
 				category: data.category,
-				exchangeType: data.exchangeType as any,
+				exchangeType: data.exchangeType as ExchangeType,
 				tradeFor: data.tradeFor ?? null,
 				photos: data.photos,
 				lat: data.lat,
@@ -48,8 +49,9 @@ export async function POST(req: Request) {
 			},
 		});
 		return Response.json(item);
-	} catch (e: any) {
-		return new Response(e?.message ?? "Failed to create", { status: 500 });
+	} catch (e: unknown) {
+		const message = e instanceof Error ? e.message : "Failed to create";
+		return new Response(message, { status: 500 });
 	}
 }
 
